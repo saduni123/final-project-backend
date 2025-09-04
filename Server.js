@@ -1,62 +1,33 @@
+// server.js
 import express from "express";
 import mongoose from "mongoose";
-import cors from "cors";
-import bcrypt from "bcryptjs";
-import bodyParser from "body-parser";
+import cors from "cors";                // ✅ CORS import
+import authRoutes from "./Routes/Auth.js";
 
 const app = express();
-app.use(cors());
-app.use(bodyParser.json());
+const PORT = process.env.PORT || 5000;
 
-// MongoDB connection
-mongoose.connect("mongodb://localhost:27017/photofind", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+// Middleware
+app.use(cors());                        // ✅ Allow all origins
+app.use(express.json());                // Parse JSON request body
+
+// Routes
+app.use("/api/auth", authRoutes);
+
+// MongoDB Connection
+const MONGO_URI = "mongodb://127.0.0.1:27017/photographyApp";
+
+mongoose.connect(MONGO_URI)
+  .then(() => {
+    console.log("✅ MongoDB connected");
+    app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
+  })
+  .catch(err => {
+    console.error("❌ MongoDB connection error:", err);
+    process.exit(1);
+  });
+
+// Optional root route
+app.get("/", (req, res) => {
+  res.send("Server is running!");
 });
-
-const userSchema = new mongoose.Schema({
-  name: String,
-  email: { type: String, unique: true },
-  password: String,
-});
-
-const User = mongoose.model("User", userSchema);
-
-// Register
-app.post("/api/auth/register", async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) return res.status(400).json({ message: "All fields required" });
-
-    const existing = await User.findOne({ email });
-    if (existing) return res.status(400).json({ message: "Email already registered" });
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ name, email, password: hashedPassword });
-    await user.save();
-
-    res.status(201).json({ message: "Registration successful", user: { name: user.name, email: user.email } });
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// Login
-app.post("/api/auth/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ message: "All fields required" });
-
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invalid email or password" });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
-
-    res.status(200).json({ message: "Login successful", user: { name: user.name, email: user.email } });
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-app.listen(5000, () => console.log("Server running on port 5000"));
