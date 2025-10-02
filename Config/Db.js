@@ -1,24 +1,11 @@
-
 import mongoose from "mongoose";
 
 const connectDB = async () => {
-  const uri = process.env.MONGO_URI;
-
-  console.log("Checking .env load: MONGO_URI =", uri);
-
-  if (!uri) {
-    console.error("❌ MONGO_URI is not defined in .env");
-    process.exit(1);
-  }
-
   try {
-    await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("✅ MongoDB connected successfully!");
-  } catch (error) {
-    console.error("❌ MongoDB connection failed:", error.message);
+    await mongoose.connect("mongodb://127.0.0.1:27017/photobooking");
+    console.log("✅ MongoDB Connected");
+  } catch (err) {
+    console.error("❌ DB Connection Failed", err);
     process.exit(1);
   }
 };

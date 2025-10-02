@@ -1,12 +1,12 @@
-import mongoose from "mongoose";
-
-const notificationSchema = new mongoose.Schema(
+notifications: [
   {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    message: { type: String, required: true },
-    read: { type: Boolean, default: false },
-  },
-  { timestamps: true }
-);
-
-export default mongoose.model("Notification", notificationSchema);
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    date: String,
+    time: String,
+    location: String,
+    name: String,
+    email: String,
+    contact: String,
+    read: { type: Boolean, default: false }
+  }
+]

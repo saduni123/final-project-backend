@@ -1,18 +1,19 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
-const portfolioSchema = new mongoose.Schema({
-  image_url: String,
-  caption: String
-})
-
-const photographerSchema = new mongoose.Schema({
+const PhotographerSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  location: { type: String, required: true },
-  min_budget: Number,
-  max_budget: Number,
-  bio: String,
-  avatar_url: String,
-  portfolio: [portfolioSchema]
-}, { timestamps: true })
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, default: "photographer" },
+  price: { type: Number, default: 0 },
+  details: [
+    {
+      title: String,
+      description: String,
+      contact: String,
+      date: { type: Date, default: Date.now }
+    }
+  ]
+}, { timestamps: true });
 
-export default mongoose.model("Photographer", photographerSchema)
+export default mongoose.model("Photographer", PhotographerSchema);

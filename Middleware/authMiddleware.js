@@ -1,15 +1,13 @@
-import jwt from "jsonwebtoken";
+import express from "express";
+import cors from "cors";
 
-export default function authMiddleware(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ message: "No token provided" });
+const app = express();
 
-  const token = authHeader.split(" ")[1];
-  try {
-    const decoded = jwt.verify(token, "your_jwt_secret");
-    req.user = { id: decoded.id };
-    next();
-  } catch (err) {
-    res.status(401).json({ message: "Invalid token" });
-  }
-}
+// Allow all local dev ports (or just your port)
+app.use(cors({
+  origin: ["http://localhost:5173", "http://localhost:5174"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
+app.use(express.json());

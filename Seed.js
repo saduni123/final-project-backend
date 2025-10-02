@@ -1,7 +1,7 @@
 import dotenv from "dotenv"
 import mongoose from "mongoose"
 import connectDB from "./Config/Db.js"
-import Photographer from "./Models/Photographer.js"
+import Photographer from "./models/Photographer.js"
 
 dotenv.config()
 await connectDB()

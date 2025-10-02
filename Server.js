@@ -1,33 +1,34 @@
 // server.js
 import express from "express";
 import mongoose from "mongoose";
-import cors from "cors";                // ✅ CORS import
-import authRoutes from "./Routes/Auth.js";
+import cors from "cors";
+
+// Routes
+import authRoutes from "./routes/auth.js";
+import photographerDetailsRoutes from "./routes/photographerDetails.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors());                        // ✅ Allow all origins
-app.use(express.json());                // Parse JSON request body
+// ✅ Middleware
+app.use(cors({
+  origin: ["http://localhost:5173", "http://localhost:5174"],
+  methods: ["GET","POST","PUT","DELETE"],
+  credentials: true
+}));
+app.use(express.json());
 
-// Routes
+// ✅ Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/photographer-details", photographerDetailsRoutes);
 
-// MongoDB Connection
-const MONGO_URI = "mongodb://127.0.0.1:27017/photographyApp";
+// ✅ MongoDB Connection
+mongoose.connect("mongodb://127.0.0.1:27017/photographyDB")
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-mongoose.connect(MONGO_URI)
-  .then(() => {
-    console.log("✅ MongoDB connected");
-    app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
-  })
-  .catch(err => {
-    console.error("❌ MongoDB connection error:", err);
-    process.exit(1);
-  });
+// ✅ Test endpoint
+app.get("/", (req, res) => res.send("🚀 Server is running"));
 
-// Optional root route
-app.get("/", (req, res) => {
-  res.send("Server is running!");
-});
+// ✅ Start server
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
